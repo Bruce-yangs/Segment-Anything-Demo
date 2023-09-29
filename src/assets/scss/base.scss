@@ -1,0 +1,9 @@
+
+.my-element {
+    opacity: 1;
+    transition: opacity 1s;
+  }
+  
+  .my-element.active {
+    opacity: 0.4;
+  }
