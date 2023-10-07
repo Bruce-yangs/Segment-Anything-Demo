@@ -114,7 +114,7 @@ const App = () => {
       if(type) {
         const imgs = new Image();
         // img.src = IMAGE_PATH;
-        imgs.src = url.href;
+        imgs.src = url.href+'?id='+Date.now();
         imgs.onload = function() {
           const { height, width, samScale } = handleImageScale(imgs);
           setModelScale({
