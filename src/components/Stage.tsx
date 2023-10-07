@@ -31,7 +31,6 @@ const Stage = ({
   uploadFile,
   creatGround,
   delGround,
-  initImg,
 }: any) => {
   const {
     clicks: [clicks, setClicks],
@@ -321,7 +320,7 @@ const Stage = ({
           <Button
             danger
             className="w-full"
-            onClick={resetInit}
+            onClick={baseReset}
             disabled={isLoading}
             loading={isLoading}
             icon={<DeleteOutlined />}
@@ -356,7 +355,6 @@ const Stage = ({
             className="w-full"
             icon={<SyncOutlined />}
             onClick={resetInit}
-            // onClick={initImg}
             loading={isLoading}
             type="primary"
           >

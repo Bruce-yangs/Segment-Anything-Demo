@@ -38,7 +38,7 @@ const App = () => {
   const {
     clicks: [clicks, setClicks],
     clickType: [clickType, setClickType],
-    image: [, setImage],
+    image: [image, setImage],
     maskImg: [maskImg, setMaskImg],
   } = useContext(AppContext)!;
   const [model, setModel] = useState<InferenceSession | null>(null); // ONNX model
@@ -237,15 +237,12 @@ const App = () => {
 // const url = new URL(IMAGE_PATH, _curUrl);
 // loadImage(url);
 
-
-
-
     runONNX();
-    console.log("clickType");
-    console.log(clickType);
-
+    let obj: any = {
+      href: image.src,
+    };
+    loadImage(obj);
     
-
   }, [clicks]);
 
   const updateImg = () => {
@@ -337,22 +334,27 @@ const App = () => {
       })
       .then((response) => {
         console.log(response.data);
-        const { ret, image_uri } = response.data;
+        const { ret, image_uri, image_emb, key } = response.data;
         if (ret == 0) {
           let _url = _curUrl + "/" + image_uri;
           let obj: any = { href: _url };
-          loadImage(obj);
-          resetInit();
+          updateImg();
+          loadImage(obj,1);
+
+          const URL_NPY = _curUrl + "/" + image_emb;
+          loadTensor(URL_NPY);
+          setFileImgKey(key);
+          setIsLoading(false);
           console.log("背景生成成功===========");
         }
       })
       .catch((error) => {
-        console.error(error);
         // 处理上传失败的逻辑
+        console.error(error);
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      // .finally(() => {
+      //   setIsLoading(false);
+      // });
   }
   //识别颜色 对应坐标
   function getRGBFromCanvas(canvas: any, x: number, y: number) {
@@ -382,10 +384,10 @@ const App = () => {
 
   //公共清除图片恢复状态
   function baseReset() {
-    const maskPoints = document.querySelectorAll(".mask-point");
-    maskPoints.forEach((element) => {
-      element.remove();
-    });
+    // const maskPoints = document.querySelectorAll(".mask-point");
+    // maskPoints.forEach((element) => {
+    //   element.remove();
+    // });
     setClicks([])
     setMaskImg([]);
     setClickType(1);
@@ -402,23 +404,12 @@ const App = () => {
     baseReset()
     //此处保留
     bakImgInfo && loadImage(bakImgInfo);
+    setFileImgKey(bakImgInfo.key);
+    loadTensor(bakImgInfo.npy);
     console.log("清除----mask");
   };
 
-
-
-  //恢复初始图
-  const initImg = () => {
-    const maskPoints = document.querySelectorAll(".mask-point");
-    maskPoints.forEach((element) => {
-      element.remove();
-    });
-    setMaskImg([]);
-    loadImage(bakImgInfo);
-
-    console.log("恢复----初始化图片");
-  };
-
+//上传数据
   const uploadFile = () => {
     // 执行上传操作，例如将选定的文件发送到服务器
     if (maskImg.length) {
@@ -469,6 +460,7 @@ const App = () => {
     }
   };
 
+  //图片上传
   const handleFileChange = (event: any) => {
     setIsLoading(true);
 
@@ -496,6 +488,25 @@ const App = () => {
               loadTensor(URL_NPY);
               resetInit();
               setFileImgKey(key);
+
+
+               // 使用 FileReader 将文件读取为 DataURL 格式的字符串
+              const reader: any = new FileReader();
+              reader.onload = () => {
+                // setPreviewUrl(reader.result);
+                //此处要生存img标签类型的文件
+                console.log("reader============");
+                console.log(reader);
+                // console.log(reader.result);
+                let obj: any = {
+                  href: reader.result,
+                  key: key,
+                  npy: URL_NPY,
+                };
+                loadImage(obj);
+                setBakImgInfo(obj);
+              };
+              reader.readAsDataURL(file);
               // console.log("fileImgKey=========");
               // console.log(fileImgKey);
             }
@@ -508,28 +519,11 @@ const App = () => {
             console.error(error);
             // 处理上传失败的逻辑
           });
-        // .finally(() => {
-        //   setIsLoading(false);
-        // });
+    
       }
-      // 使用 FileReader 将文件读取为 DataURL 格式的字符串
-      const reader: any = new FileReader();
-      reader.onload = () => {
-        // setPreviewUrl(reader.result);
-        //此处要生存img标签类型的文件
-        console.log("reader============");
-        console.log(reader);
-        // console.log(reader.result);
-        let obj: any = {
-          href: reader.result,
-        };
-        loadImage(obj);
-        setBakImgInfo(obj);
-      };
-      reader.readAsDataURL(file);
+     
     } catch (error) {
       // 处理错误
-      // setIsLoading(false);
       console.log(error);
     }
   };
@@ -675,7 +669,6 @@ const App = () => {
       uploadFile={uploadFile}
       creatGround={creatGround}
       delGround={delGround}
-      initImg={initImg}
       bakImgInfo={bakImgInfo}
       loadImage={loadImage}
     />
