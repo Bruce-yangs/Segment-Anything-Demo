@@ -29,10 +29,10 @@ mv $dest_dist $static_dir
 cp -r $static_bak/outimage $static_dir
 echo "dist to static finish"
 
-echo "start stop nginx"
-systemctl stop nginx
-echo "nginx stopped!"
-sleep 1
-echo "start nginx"
-systemctl start nginx
-echo "nginx started!"
+#echo "start stop nginx"
+#systemctl stop nginx
+#echo "nginx stopped!"
+#sleep 1
+#echo "start nginx"
+#systemctl start nginx
+#echo "nginx started!"
