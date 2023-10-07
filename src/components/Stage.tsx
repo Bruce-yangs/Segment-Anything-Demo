@@ -26,6 +26,7 @@ import Tool from "./Tool";
 const Stage = ({
   handleFileChange,
   resetInit,
+  baseReset,
   isLoading,
   uploadFile,
   creatGround,
@@ -367,7 +368,7 @@ const Stage = ({
       <div
         className="absolute left-3 h-5/6 my-20"
         style={{
-          padding: "20px 20px",
+          padding: "20px 45px",
           border: "1px solid #ccc",
           borderRadius: "10px",
           textAlign: "center",
@@ -411,7 +412,7 @@ const Stage = ({
           <Tool
             handleMouseMove={handleMouseMove}
             handleFileChange={handleFileChange}
-            resetInit={resetInit}
+            baseReset={baseReset}
             isLoading={isLoading}
             uploadFile={uploadFile}
           />

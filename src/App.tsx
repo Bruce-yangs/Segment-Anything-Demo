@@ -89,10 +89,11 @@ const App = () => {
 
     initModel();
 
+
     // Load the image
-    const url = new URL(IMAGE_PATH, _curUrl);
-    loadImage(url);
-    loadTensor(IMAGE_EMBEDDING);
+    // const url = new URL(IMAGE_PATH, _curUrl);
+    // loadImage(url);
+    // loadTensor(IMAGE_EMBEDDING);
 
     console.log("完毕=====");
 
@@ -106,10 +107,32 @@ const App = () => {
   }, []);
 
   //加载图片
-  const loadImage = async (url: URL) => {
+  const loadImage = async (url: URL,type?:number) => {
     try {
       // console.log("url======");
       // console.log(url);
+      if(type) {
+        const imgs = new Image();
+        // img.src = IMAGE_PATH;
+        imgs.src = url.href;
+        imgs.onload = function() {
+          const { height, width, samScale } = handleImageScale(imgs);
+          setModelScale({
+            height: height, // original image height
+            width: width, // original image width
+            samScale: samScale, // scaling factor for image which has been resized to longest side 1024
+          });
+          imgs.width = width;
+          imgs.height = height;
+          setImage(imgs);
+        }
+        return
+      }
+
+
+
+
+
       const img = new Image();
       // img.src = IMAGE_PATH;
       img.src = url.href;
@@ -211,8 +234,8 @@ const App = () => {
   // Run the ONNX model every time clicks has changed
   useEffect(() => {
 // loadImage(bakImgInfo);
-const url = new URL(IMAGE_PATH, _curUrl);
-loadImage(url);
+// const url = new URL(IMAGE_PATH, _curUrl);
+// loadImage(url);
 
 
 
@@ -225,9 +248,13 @@ loadImage(url);
 
   }, [clicks]);
 
+  const updateImg = () => {
+    baseReset()
+    console.log("去物体更新----图片");
+  };
+
   //去掉识别物体
   function delGround() {
-    const formData = new FormData();
     if (!maskImg.length) {
       messageApi.open({
         type: "warning",
@@ -235,8 +262,8 @@ loadImage(url);
       });
       return;
     }
+    const formData = new FormData();
     setIsLoading(true);
-
     const results = maskImg.length ? maskImg[0].img.src : "";
 
     if (fileImgKey) {
@@ -256,8 +283,9 @@ loadImage(url);
         if (ret == 0) {
           let _url = _curUrl + "/" + image_uri;
           let obj: any = { href: _url };
-          loadImage(obj);
-          resetInit();
+          updateImg();
+          //1代表重新更新图片，不处理点击状态的 点击记录
+          loadImage(obj,1);
           console.log("背景生成成功===========");
         }
       })
@@ -344,33 +372,32 @@ loadImage(url);
     return canvas;
   }
 
-  //重置
-  const resetInit = () => {
+  //公共清除图片恢复状态
+  function baseReset() {
     const maskPoints = document.querySelectorAll(".mask-point");
     maskPoints.forEach((element) => {
       element.remove();
     });
+    setClicks([])
+    setMaskImg([]);
+    setClickType(1);
+  }
+
+  //重置
+  const resetInit = () => {
+   
     const inputDom: any = document.getElementById("desc");
-
-
     // inputDom.value = "";
     // bakImgInfo
     // setImage();
 
+    baseReset()
     //此处保留
     bakImgInfo && loadImage(bakImgInfo);
-
-    setClicks([])
-
-    //======此处测试代码可删除===start===
-    const url = new URL(IMAGE_PATH, _curUrl);
-    loadImage(url);
-    //======此处测试代码可删除===end===
-
-    setMaskImg([]);
-    setClickType(1);
     console.log("清除----mask");
   };
+
+
 
   //恢复初始图
   const initImg = () => {
@@ -635,6 +662,7 @@ loadImage(url);
     <Stage
       handleFileChange={handleFileChange}
       resetInit={resetInit}
+      baseReset={baseReset}
       isLoading={isLoading}
       uploadFile={uploadFile}
       creatGround={creatGround}

@@ -18,7 +18,7 @@ import axios from "./tools/request";
 const Tool = ({
   handleMouseMove,
   handleFileChange,
-  resetInit,
+  baseReset,
   isLoading,
   uploadFile,
 }: any) => {
@@ -92,7 +92,7 @@ const Tool = ({
 
   function delImg() {
     setImage(null);
-    resetInit();
+    baseReset();
     const root: any = document.getElementById("root");
     root.style.backgroundImage = "none";
   }
