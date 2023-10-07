@@ -279,23 +279,31 @@ const App = () => {
       })
       .then((response) => {
         console.log(response.data);
-        const { ret, image_uri } = response.data;
+        const { ret, image_uri, image_emb, key } = response.data;
         if (ret == 0) {
           let _url = _curUrl + "/" + image_uri;
           let obj: any = { href: _url };
           updateImg();
           //1代表重新更新图片，不处理点击状态的 点击记录
           loadImage(obj,1);
+
+          const URL_NPY = _curUrl + "/" + image_emb;
+          loadTensor(URL_NPY);
+          setFileImgKey(key);
+
+
           console.log("背景生成成功===========");
+          setIsLoading(false);
+
         }
       })
       .catch((error) => {
         console.error(error);
         // 处理上传失败的逻辑
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      // .finally(() => {
+      //   setIsLoading(false);
+      // });
   }
   //生成背景
   function creatGround() {
