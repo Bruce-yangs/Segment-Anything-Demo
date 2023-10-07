@@ -185,7 +185,7 @@ const Stage = ({
   const items: TabsProps["items"] = [
     {
       key: "1",
-      label: "选择工具",
+      label: "替换识别物体",
       children: (
         <Space direction={"vertical"}>
           {/* <Button
@@ -243,7 +243,7 @@ const Stage = ({
     },
     {
       key: "2",
-      label: "背景生成",
+      label: "替换物体背景",
       children: (
         <>
           <Space direction={"vertical"}>
@@ -275,7 +275,7 @@ const Stage = ({
     },
     {
       key: "3",
-      label: "去物体",
+      label: "删除识别物体",
       children: (
         <Space direction={"vertical"}>
           {/* <Button
@@ -307,7 +307,7 @@ const Stage = ({
             loading={isLoading}
             icon={<PlusOutlined />}
           >
-            添加mask
+            选择识别区域
           </Button>
           <Button
             type={clickType === 2 ? "primary" : "default"}
@@ -316,7 +316,7 @@ const Stage = ({
             loading={isLoading}
             icon={<MinusOutlined />}
           >
-            删除mask
+            去除识别区域
           </Button>
           <Button
             danger
@@ -326,7 +326,7 @@ const Stage = ({
             loading={isLoading}
             icon={<DeleteOutlined />}
           >
-            清除mask
+            清空选择
           </Button>
           {/* <Button
               className="w-full relative"
@@ -360,7 +360,7 @@ const Stage = ({
             loading={isLoading}
             type="primary"
           >
-            重置
+            恢复初始图片
           </Button>
         </Space>
         {/*  ) : null} */}
@@ -374,7 +374,7 @@ const Stage = ({
           textAlign: "center",
         }}
       >
-        <div className="text-slate-500 mb-2 text-sm">工作台</div>
+        <div className="text-slate-500 mb-2 text-sm">功能</div>
         <Tabs
           className="mt-5"
           defaultActiveKey="1"
@@ -420,7 +420,7 @@ const Stage = ({
       </div>
       {isLoading ? (
         <Spin
-          tip="正在解析文件，请稍后哦..."
+          tip="处理中，请稍后..."
           size="large"
           style={{
             position: "fixed",
