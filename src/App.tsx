@@ -46,6 +46,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true); // isLoading
   const [fileImgKey, setFileImgKey] = useState<string>(""); //file
   const [bakImgInfo, setBakImgInfo] = useState<any>(null); //file
+  const [currentImgInfo, setCurrentImgInfo] = useState<any>(null); //当前生成后的图片
 
   // The ONNX model expects the input to be rescaled to 1024.
   // The modelScale state variable keeps track of the scale values.
@@ -89,12 +90,6 @@ const App = () => {
 
     initModel();
 
-
-    // Load the image
-    // const url = new URL(IMAGE_PATH, _curUrl);
-    // loadImage(url);
-    // loadTensor(IMAGE_EMBEDDING);
-
     console.log("完毕=====");
 
     // Load the Segment Anything pre-computed embedding
@@ -103,19 +98,18 @@ const App = () => {
     // );
     // var data = 'http://localhost:3000/assets/data/dogs_embedding.npy'
     // loadTensor(data);
-
   }, []);
 
   //加载图片
-  const loadImage = async (url: URL,type?:number) => {
+  const loadImage = async (url: URL, type?: number) => {
     try {
       // console.log("url======");
       // console.log(url);
-      if(type) {
+      if (type) {
         const imgs = new Image();
         // img.src = IMAGE_PATH;
-        imgs.src = url.href+'?id='+Date.now();
-        imgs.onload = function() {
+        imgs.src = url.href + "?id=" + Date.now();
+        imgs.onload = function () {
           const { height, width, samScale } = handleImageScale(imgs);
           setModelScale({
             height: height, // original image height
@@ -124,53 +118,40 @@ const App = () => {
           });
           imgs.width = width;
           imgs.height = height;
+          console.log("进来了");
+
           setImage(imgs);
-        }
-        return
+        };
+        return false;
       }
-
-
-
-
 
       const img = new Image();
       // img.src = IMAGE_PATH;
       img.src = url.href;
       img.onload = () => {
-
         const canvas = document.createElement("canvas");
         // document.body.appendChild(canvas);
-        const ctx:any = canvas.getContext("2d");
+        const ctx: any = canvas.getContext("2d");
         canvas.width = img.width;
         canvas.height = img.height;
-      
-        console.log('clicks======');
+
+        console.log("clicks======");
         console.log(clicks);
-        
-        // ctx.fillStyle = 'red'; // 设置填充颜色为红色
-        // ctx.beginPath();
-        // ctx.arc(clicks[0].x, clicks[0].y, 5, 0, 2 * Math.PI); // 绘制半径为 5px 的圆形
-        // // ctx.arc(515.7232236154649, 236.4690438871473, 5, 0, 2 * Math.PI); // 绘制半径为 5px 的圆形
-        // ctx.fill();
-      
 
+        // ctx?.putImageData(img, 0, 0);
+        ctx && ctx.drawImage(img, 0, 0);
 
-         // ctx?.putImageData(img, 0, 0);
-         ctx && ctx.drawImage(img, 0, 0);
-
-         clicks?.map((val:any)=>{
-          ctx.fillStyle = val.clickType == 1?'green': 'pink'; // 设置填充颜色为红色
+        clicks?.map((val: any) => {
+          ctx.fillStyle = val.clickType == 1 ? "green" : "pink"; // 设置填充颜色为红色
           ctx.beginPath();
           ctx.arc(val.x, val.y, 5, 0, 2 * Math.PI); // 绘制半径为 5px 的圆形
           ctx.fill();
-         })
+        });
 
-
-      
-      const imgs = new Image();
-      // img.src = IMAGE_PATH;
+        const imgs = new Image();
+        // img.src = IMAGE_PATH;
         imgs.src = canvas.toDataURL();
-        imgs.onload = function() {
+        imgs.onload = function () {
           const { height, width, samScale } = handleImageScale(imgs);
           setModelScale({
             height: height, // original image height
@@ -180,16 +161,12 @@ const App = () => {
           imgs.width = width;
           imgs.height = height;
           setImage(imgs);
-        canvas.remove();
+          canvas.remove();
+        };
 
-        }
-  
-         // 销毁canvas
-
+        // 销毁canvas
 
         // console.log(img.src);
-        
-
 
         // const { height, width, samScale } = handleImageScale(imgs);
         // setModelScale({
@@ -201,8 +178,6 @@ const App = () => {
         // imgs.height = height;
         // setImage(imgs);
 
-
-
         //  const root: any = document.getElementById("root");
         // root.style.backgroundImage = `url(${img.src})`;
         // root.style.backgroundSize = "cover";
@@ -210,17 +185,12 @@ const App = () => {
 
         // root.style.background = `linear-gradient(to right,#fff,#CC99FF)`;
 
-
         // 应用高斯模糊效果
         // root.style.filter = "blur(10px)"; // 调整模糊程度
-
-
       };
     } catch (error) {
       console.log(error);
     }
-
-   
   };
 
   // Decode a Numpy file into a tensor.
@@ -233,21 +203,28 @@ const App = () => {
 
   // Run the ONNX model every time clicks has changed
   useEffect(() => {
-// loadImage(bakImgInfo);
-// const url = new URL(IMAGE_PATH, _curUrl);
-// loadImage(url);
+    // loadImage(bakImgInfo);
+    // const url = new URL(IMAGE_PATH, _curUrl);
+    // loadImage(url);
 
-    runONNX();
-    let obj: any = {
-      href: image.src,
-    };
-    loadImage(obj);
-    
+    console.log("clicks=====");
+    console.log(clicks);
+
+    if (clicks?.length) {
+      runONNX();
+      if (!image) return;
+      // let obj: any = {
+      //   href:  currentImgInfo?.href,
+      //   // href: image.src,
+      // };
+
+      // loadImage(currentImgInfo);
+    }
   }, [clicks]);
 
   const updateImg = () => {
-    baseReset()
-    console.log("去物体更新----图片");
+    baseReset();
+    console.log("更新----图片");
   };
 
   //去掉识别物体
@@ -259,8 +236,8 @@ const App = () => {
       });
       return;
     }
-    const formData = new FormData();
     setIsLoading(true);
+    const formData = new FormData();
     const results = maskImg.length ? maskImg[0].img.src : "";
 
     if (fileImgKey) {
@@ -276,31 +253,33 @@ const App = () => {
       })
       .then((response) => {
         console.log(response.data);
-        const { ret, image_uri, image_emb, key } = response.data;
+        const { ret, image_uri, image_emb, key, msg } = response.data;
         if (ret == 0) {
           let _url = _curUrl + "/" + image_uri;
           let obj: any = { href: _url };
           updateImg();
           //1代表重新更新图片，不处理点击状态的 点击记录
-          loadImage(obj,1);
+          loadImage(obj, 1);
 
           const URL_NPY = _curUrl + "/" + image_emb;
           loadTensor(URL_NPY);
           setFileImgKey(key);
-
-
+          setCurrentImgInfo(obj);
           console.log("背景生成成功===========");
-          setIsLoading(false);
-
+        } else {
+          messageApi.open({
+            type: "error",
+            content: msg,
+          });
         }
       })
       .catch((error) => {
         console.error(error);
         // 处理上传失败的逻辑
-      })
-      // .finally(() => {
-      //   setIsLoading(false);
-      // });
+      });
+    // .finally(() => {
+    //   setIsLoading(false);
+    // });
   }
   //生成背景
   function creatGround() {
@@ -334,27 +313,32 @@ const App = () => {
       })
       .then((response) => {
         console.log(response.data);
-        const { ret, image_uri, image_emb, key } = response.data;
+        const { ret, image_uri, image_emb, key, msg } = response.data;
         if (ret == 0) {
           let _url = _curUrl + "/" + image_uri;
           let obj: any = { href: _url };
           updateImg();
-          loadImage(obj,1);
+          loadImage(obj, 1);
 
           const URL_NPY = _curUrl + "/" + image_emb;
           loadTensor(URL_NPY);
           setFileImgKey(key);
-          setIsLoading(false);
+          setCurrentImgInfo(obj);
           console.log("背景生成成功===========");
+        } else {
+          messageApi.open({
+            type: "error",
+            content: msg,
+          });
         }
       })
       .catch((error) => {
         // 处理上传失败的逻辑
         console.error(error);
-      })
-      // .finally(() => {
-      //   setIsLoading(false);
-      // });
+      });
+    // .finally(() => {
+    //   setIsLoading(false);
+    // });
   }
   //识别颜色 对应坐标
   function getRGBFromCanvas(canvas: any, x: number, y: number) {
@@ -388,28 +372,32 @@ const App = () => {
     // maskPoints.forEach((element) => {
     //   element.remove();
     // });
-    setClicks([])
+    setClicks([]);
     setMaskImg([]);
     setClickType(1);
+    if (currentImgInfo) {
+      loadImage(currentImgInfo, 1);
+    }
   }
 
   //重置
   const resetInit = () => {
-   
-    const inputDom: any = document.getElementById("desc");
+    // const inputDom: any = document.getElementById("desc");
     // inputDom.value = "";
     // bakImgInfo
     // setImage();
-
-    baseReset()
+    baseReset();
     //此处保留
-    bakImgInfo && loadImage(bakImgInfo);
-    setFileImgKey(bakImgInfo.key);
-    loadTensor(bakImgInfo.npy);
+    if (bakImgInfo) {
+      loadImage(bakImgInfo, 1);
+      setFileImgKey(bakImgInfo.key);
+      loadTensor(bakImgInfo.npy);
+    }
+
     console.log("清除----mask");
   };
 
-//上传数据
+  //上传数据
   const uploadFile = () => {
     // 执行上传操作，例如将选定的文件发送到服务器
     if (maskImg.length) {
@@ -421,15 +409,17 @@ const App = () => {
       const results = maskImg.length ? maskImg[0].img.src : "";
       // const maskData = JSON.stringify(results);
       const inputDom: any = document.getElementById("desc");
+      const inputDom2: any = document.getElementById("desc2");
 
       if (fileImgKey) {
         formData.append("key", fileImgKey);
       }
       console.log("outputs=========masks=====");
-      console.log(results);
+      // console.log(results);
 
       formData.append("mask", results);
       formData.append("text_prompt", inputDom.value);
+      formData.append("n_prompt", inputDom2.value);
 
       axios
         .post("/generate", formData, {
@@ -440,10 +430,32 @@ const App = () => {
         .then((response) => {
           // 处理上传成功的逻辑
           console.log(response.data);
-          messageApi.open({
-            type: "success",
-            content: "提交成功",
-          });
+          const { ret, image_uri, image_emb, key, msg } = response.data;
+          if (ret == 0) {
+            let _url = _curUrl + "/" + image_uri;
+            let obj: any = { href: _url };
+            updateImg();
+            //1代表重新更新图片，不处理点击状态的 点击记录
+            loadImage(obj, 1);
+
+            const URL_NPY = _curUrl + "/" + image_emb;
+            loadTensor(URL_NPY);
+            setFileImgKey(key);
+
+            setCurrentImgInfo(obj);
+
+            console.log("背景生成成功===========");
+            messageApi.open({
+              type: "success",
+              content: "提交成功",
+            });
+          } else {
+            messageApi.open({
+              type: "error",
+              content: msg,
+            });
+          }
+
           //接受返回的npy文件进行loadTensor函数加载，清除之前的绘画效果
           // loadTensor(IMAGE_EMBEDDING);
           // resetInit();
@@ -481,34 +493,46 @@ const App = () => {
           .post("/upload", formData)
           .then((response) => {
             // 处理上传成功的逻辑
-            const { ret, key, image_emb } = response.data;
+            const { ret, key, image_emb, msg, image_uri } = response.data;
             console.log(response.data);
             if (ret == 0) {
               const URL_NPY = _curUrl + "/" + image_emb;
+              let _url = _curUrl + "/" + image_uri;
+
               loadTensor(URL_NPY);
               resetInit();
               setFileImgKey(key);
 
-
-               // 使用 FileReader 将文件读取为 DataURL 格式的字符串
-              const reader: any = new FileReader();
-              reader.onload = () => {
-                // setPreviewUrl(reader.result);
-                //此处要生存img标签类型的文件
-                console.log("reader============");
-                console.log(reader);
-                // console.log(reader.result);
-                let obj: any = {
-                  href: reader.result,
-                  key: key,
-                  npy: URL_NPY,
-                };
-                loadImage(obj);
-                setBakImgInfo(obj);
+              let obj: any = {
+                href: _url,
+                key: key,
+                npy: URL_NPY,
               };
-              reader.readAsDataURL(file);
-              // console.log("fileImgKey=========");
-              // console.log(fileImgKey);
+              loadImage(obj,1);
+              setBakImgInfo(obj);
+
+              // 使用 FileReader 将文件读取为 DataURL 格式的字符串
+              // const reader: any = new FileReader();
+              // reader.onload = () => {
+              //   // setPreviewUrl(reader.result);
+              //   //此处要生存img标签类型的文件
+              //   console.log("reader============");
+
+              //   let obj: any = {
+              //     href: _url,
+              //     // href: reader.result,
+              //     key: key,
+              //     npy: URL_NPY,
+              //   };
+              //   loadImage(obj);
+              //   setBakImgInfo(obj);
+              // };
+              // reader.readAsDataURL(file);
+            } else {
+              messageApi.open({
+                type: "error",
+                content: msg,
+              });
             }
 
             //接受返回的npy文件进行loadTensor函数加载，清除之前的绘画效果
@@ -519,9 +543,7 @@ const App = () => {
             console.error(error);
             // 处理上传失败的逻辑
           });
-    
       }
-     
     } catch (error) {
       // 处理错误
       console.log(error);
@@ -559,85 +581,12 @@ const App = () => {
         // The predicted mask returned from the ONNX model is an array which is
         // rendered as an HTML image using onnxMaskToImage() from maskUtils.tsx.
 
-        // if (clickType === 2) {
-        //   if (maskImg.length) {
-        //     let imgArr: any = _.clone(maskImg);
-
-        //     imgArr.reverse();
-
-        //     var filteredData: any = imgArr.find((item: any) => {
-        //       console.log("item=====");
-        //       console.log(item);
-        //       const rgb = getRGBFromCanvas(
-        //         item.canvas,
-        //         clicks[0].x,
-        //         clicks[0].y
-        //       );
-        //       if (rgb.blue) {
-        //         console.log("已有数据");
-        //         return item;
-        //       }
-        //     });
-
-        //     if (!filteredData.id) return;
-        //     let curImgMasks = maskImg.filter(
-        //       (v: any) => v.id != filteredData.id
-        //     );
-
-        //     setMaskImg(curImgMasks);
-
-        //     return;
-        //   } else {
-        //     alert("暂无可删除的mask");
-        //   }
-        //   console.log(maskImg.length);
-
-        //   return;
-        // }
-
-        // console.log(' output.data=========');
-        // console.log( output.data);
-
         const newImg = onnxMaskToImage(
           output.data,
           output.dims[2],
           output.dims[3],
           clicks
         );
-
-        // let flag = true;
-        // if (maskImg.length) {
-        //   maskImg.map((item: any) => {
-        //     const rgb = getRGBFromCanvas(item.canvas, clicks[0].x, clicks[0].y);
-        //     console.log(JSON.stringify(rgb));
-
-        //     if (rgb.blue) {
-        //       console.log("已有数据");
-        //       flag = false;
-        //     }
-        //   });
-        //   if (flag) {
-        //     const CANVAS_ITEM = await createCanvas(newImg.src);
-        //     const curObj = {
-        //       id: Date.now(),
-        //       canvas: CANVAS_ITEM,
-        //       img: newImg,
-        //       output: output,
-        //     };
-        //     console.log(curObj);
-        //     setMaskImg([...maskImg, ...[curObj]]);
-        //   }
-        // } else {
-        //   const CANVAS_ITEM = await createCanvas(newImg.src);
-        //   const curObj = {
-        //     id: Date.now(),
-        //     canvas: CANVAS_ITEM,
-        //     img: newImg,
-        //     output: output,
-        //   };
-
-        //   setMaskImg([...[curObj]]);
-        // }
 
         const CANVAS_ITEM = await createCanvas(newImg.src);
         const curObj = {
@@ -647,11 +596,6 @@ const App = () => {
           output: output,
           results: results,
         };
-
-        // console.log(">>>>>>>>>results>>>>>");
-        // console.log(results);
-
-       
 
         setMaskImg([...[curObj]]);
       }

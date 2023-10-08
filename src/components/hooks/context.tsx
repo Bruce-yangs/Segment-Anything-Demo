@@ -11,7 +11,7 @@ import AppContext from "./createContext";
 const AppContextProvider = (props: {
   children: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
 }) => {
-  const [clicks, setClicks] = useState<Array<modelInputProps> | null>(null);
+  const [clicks, setClicks] = useState<Array<modelInputProps> | null>([]);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [maskImg, setMaskImg] = useState<any>([]);
   const [clickType, setClickType] = useState<any>(1);

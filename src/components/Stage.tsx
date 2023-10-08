@@ -109,7 +109,7 @@ const Stage = ({
         <>
           <Button
             type="primary"
-            className="w-full hover:opacity-75 mt-3"
+            className="w-full hover:opacity-75"
             style={{
               // padding: " 4px 18px",
               background: "green",
@@ -123,10 +123,14 @@ const Stage = ({
             上传数据
           </Button>
 
-          <Input
-            type="text"
-            placeholder="图片描述"
-            id="desc"
+          <Input.TextArea
+            placeholder="正向提示词(英文)"
+            id="desc" rows={4}
+            className="h-8 border w-full text-sm mt-3"
+          />
+          <Input.TextArea
+            placeholder="负向提示词(英文)"
+            id="desc2" rows={4}
             className="h-8 border w-full text-sm mt-3"
           />
         </>
@@ -145,16 +149,16 @@ const Stage = ({
             背景生成
           </Button>
 
-          <Input
-            type="text"
+          <Input.TextArea
             placeholder="正向提示词(英文)"
             id="ground_prompt"
+            rows={4}
             className="h-8 border w-full text-sm mt-3"
           />
-          <Input
-            type="text"
+          <Input.TextArea
             placeholder="负向提示词(英文)"
             id="n_prompt"
+            rows={4}
             className="h-8 border w-full text-sm mt-3"
           />
         </>
@@ -164,7 +168,7 @@ const Stage = ({
       content = (
         <>
           <Button
-            className="w-full mt-3"
+            className="w-full"
             style={{ width: "180px" }}
             onClick={delGround}
             loading={isLoading}
@@ -366,7 +370,7 @@ const Stage = ({
       <div
         className="absolute left-3 h-5/6 my-20"
         style={{
-          padding: "20px 45px",
+          padding: "20px 32px",
           border: "1px solid #ccc",
           borderRadius: "10px",
           textAlign: "center",
