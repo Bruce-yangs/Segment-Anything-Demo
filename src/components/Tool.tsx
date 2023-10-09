@@ -92,9 +92,9 @@ const Tool = ({
 
   function delImg() {
     setImage(null);
-    baseReset();
-    const root: any = document.getElementById("root");
-    root.style.backgroundImage = "none";
+    baseReset(2);
+    // const root: any = document.getElementById("root");
+    // root.style.backgroundImage = "none";
   }
 
   function stopTools() {

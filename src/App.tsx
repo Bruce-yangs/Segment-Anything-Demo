@@ -28,6 +28,7 @@ import "./assets/scss/App.scss";
 // const { parse } = require("numpy-parser");
 // Define image, embedding and model paths
 // const IMAGE_PATH = "/assets/data/w.jpeg";
+const BG = "/assets/data/bg.jpg";
 const IMAGE_PATH = "/assets/data/dogs.jpg";
 const IMAGE_EMBEDDING = "/assets/data/dogs_embedding.npy";
 const MODEL_DIR = "/model/sam_onnx_quantized_example.onnx";
@@ -52,8 +53,11 @@ const App = () => {
   // The modelScale state variable keeps track of the scale values.
   const [modelScale, setModelScale] = useState<modelScaleProps | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
-
-  let _curUrl = location.origin;
+  // const apiUrl = process.env.REACT_APP_API_URL;
+  let _curUrl = process.env.REACT_APP_API_URL;
+  console.log(_curUrl);
+  
+  // let _curUrl = location.origin;
 
   const loadTensor = async (imgEmbedding: any) => {
     Promise.resolve(await loadNpyTensor(imgEmbedding, "float32")).then(
@@ -98,6 +102,12 @@ const App = () => {
     // );
     // var data = 'http://localhost:3000/assets/data/dogs_embedding.npy'
     // loadTensor(data);
+
+    // const root: any = document.getElementById("root");
+    // root.style.backgroundImage = `url(${BG})`;
+
+    // root.style.backgroundSize = "cover";
+    // root.style.backgroundPosition = "center";
   }, []);
 
   //加载图片
@@ -209,17 +219,16 @@ const App = () => {
 
     console.log("clicks=====");
     console.log(clicks);
-
+    currentImgInfo && loadImage(currentImgInfo);
     if (clicks?.length) {
       runONNX();
-      if (!image) return;
+      // if (!image) return;
       // let obj: any = {
       //   href:  currentImgInfo?.href,
       //   // href: image.src,
       // };
-
-      // loadImage(currentImgInfo);
     }
+
   }, [clicks]);
 
   const updateImg = () => {
@@ -367,7 +376,7 @@ const App = () => {
   }
 
   //公共清除图片恢复状态
-  function baseReset() {
+  function baseReset(type?:number) {
     // const maskPoints = document.querySelectorAll(".mask-point");
     // maskPoints.forEach((element) => {
     //   element.remove();
@@ -375,9 +384,15 @@ const App = () => {
     setClicks([]);
     setMaskImg([]);
     setClickType(1);
-    if (currentImgInfo) {
-      loadImage(currentImgInfo, 1);
+    if(type == 2) {
+      setBakImgInfo(null)
+      setCurrentImgInfo(null)
+      return
     }
+    // if(type) return
+    // if (currentImgInfo) {
+    //   loadImage(currentImgInfo, 1);
+    // }
   }
 
   //重置
@@ -386,13 +401,15 @@ const App = () => {
     // inputDom.value = "";
     // bakImgInfo
     // setImage();
-    baseReset();
+    
     //此处保留
     if (bakImgInfo) {
       loadImage(bakImgInfo, 1);
       setFileImgKey(bakImgInfo.key);
       loadTensor(bakImgInfo.npy);
+      setCurrentImgInfo(bakImgInfo)
     }
+    baseReset(1);
 
     console.log("清除----mask");
   };
@@ -510,6 +527,8 @@ const App = () => {
               };
               loadImage(obj,1);
               setBakImgInfo(obj);
+              setCurrentImgInfo(obj);
+
 
               // 使用 FileReader 将文件读取为 DataURL 格式的字符串
               // const reader: any = new FileReader();

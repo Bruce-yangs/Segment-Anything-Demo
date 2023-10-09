@@ -9,7 +9,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
-
+const Dotenv = require('dotenv-webpack');
 module.exports = {
   entry: "./src/index.tsx",
   resolve: {
@@ -80,5 +80,35 @@ module.exports = {
     new webpack.ProvidePlugin({
       process: "process/browser",
     }),
+    new Dotenv(),
   ],
+  devServer: {
+      // 开发时可直接访问到 ./public 下的静态资源，这些资源在开发中不必打包
+      host: "0.0.0.0",
+      // host: "123.118.15.232",
+      // host: "localhost",
+      port: 8080,
+      // open: true, // 打开浏览器
+      compress: false, // 是否压缩
+      // static: "./",
+      proxy: {
+          '/api': {
+              target: "http://123.118.15.232:8181",
+              pathRewrite: {
+                  "^/api": "/api"
+                  // "^/api": ""
+              },
+              changeOrigin: true
+          },
+          '/outimage': {
+            target: 'http://123.118.15.232:8181',
+          //   pathRewrite: {
+          //     "^/outimage": ""
+          //     // "^/api": ""
+          // },
+            // changeOrigin: true,
+          },
+      },
+      // hotOnly: true,
+  },
 };
