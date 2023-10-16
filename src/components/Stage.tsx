@@ -301,7 +301,7 @@ const Stage = ({
     <>
       {/* {image ? ( */}
 
-      <div className="t absolute left-1/2 -translate-x-1/3">
+      <div className=" absolute left-1/2 -translate-x-1/3">
         <Space className="w-full mt-5 ">
           <Button
             className="w-full"
@@ -418,6 +418,9 @@ const Stage = ({
             isLoading={isLoading}
             uploadFile={uploadFile}
           />
+        </div>
+        <div className="w-full h-full absolute left-0 top-0 -z-10 " id="bg">
+
         </div>
       </div>
       {isLoading ? (

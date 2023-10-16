@@ -103,11 +103,7 @@ const App = () => {
     // var data = 'http://localhost:3000/assets/data/dogs_embedding.npy'
     // loadTensor(data);
 
-    // const root: any = document.getElementById("root");
-    // root.style.backgroundImage = `url(${BG})`;
-
-    // root.style.backgroundSize = "cover";
-    // root.style.backgroundPosition = "center";
+   
   }, []);
 
   //加载图片

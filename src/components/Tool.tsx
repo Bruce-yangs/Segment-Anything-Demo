@@ -88,6 +88,14 @@ const Tool = ({
 
   useEffect(() => {
     fitToPage();
+    if(!image) return
+    const root: any = document.getElementById("bg");
+    root.style.backgroundImage = `url(${image.src})`;
+
+    root.style.backgroundSize = "cover";
+    root.style.backgroundPosition = "center";
+    // 应用高斯模糊效果
+     root.style.filter = "blur(100px)"; // 调整模糊程度
   }, [image]);
 
   function delImg() {
